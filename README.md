@@ -20,7 +20,9 @@
 
 如果你使用 \*\*OpenCode 等编程助手\*\*，在对话中直接说：
 
+```
 安装这个 skill：https\://github.com/Maritnbk/Martin-skills/tree/master/audit-report-confirmation
+```
 
 AI 会自动从 GitHub 下载并放到正确的位置。每个 skill 文件夹都可以单独安装。
 
