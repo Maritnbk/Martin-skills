@@ -1,42 +1,74 @@
 {
   "skill_name": "audit-report-confirmation",
+  "version": "1.1.0",
+  "last_eval_date": "2026-06-27",
   "evals": [
     {
       "id": 1,
-      "prompt": "张总刚发了我一个压缩包，里面有 5 家协会的审计报告和汇总表。我在 Downloads\\2024年审 目录下，每个协会一个文件夹。帮我把这些协会的审计报告都核对一遍——报告 docx 和汇总表 xlsx 的勾稽关系、报告内部数据对不对、还有错别字。最后给我一个总的核对结果文件。",
-      "expected_output": "完整的核对流程执行：提取每个协会的报告和汇总表 → 三类核对 → 汇总到一份核对结果文件",
-      "files": [],
-      "expectations": [
-        "执行了全部三类核对（勾稽关系、内部数据、错别字）",
-        "对每个协会都分别进行了核对",
-        "生成了汇总核对结果文件",
-        "结果文件中包含了每个协会的核对情况",
-        "没有跳过任何核对步骤"
-      ]
+      "eval_name": "single-year-2023",
+      "prompt": "核对我项目文件夹中2023年的审计报告和财报。项目在 /Users/martin/Documents/OpenCode/KFL审计报告/，2023年的文件在 2023/ 子目录下：有 3-审计报告正文.docx（报告）、4-财务报表模板(执行小企业会计准则)-2023.xlsx（财务报表）、5-附注模板(执行小企业会计准则)-2023.docx（附注）。请按三类核对的要求逐项检查并生成核对结果文件。",
+      "expected_output": "包含核对范围、三类核对结果的Markdown文件，文件命名规则：xxx核对结果.md。单年度场景应包含跨年度衔接说明标记。",
+      "assertions": [
+        {"name": "results-file-exists", "description": "核对结果文件被创建并写入", "check": "output directory contains at least one .md result file"},
+        {"name": "check1-performed", "description": "核对一已执行", "check": "result file mentions 报告与财务报表勾稽 or similar"},
+        {"name": "check2-bs-checked", "description": "资产负债表逐项加总已验证", "check": "result file mentions 资产负债表, 流动资产合计, 资产总计"},
+        {"name": "check2-pl-checked", "description": "利润表分层已验证", "check": "result file mentions 利润表, 营业利润, 净利润"},
+        {"name": "check2-cf-checked", "description": "现金流量表分层已验证", "check": "result file mentions 现金流量表, 经营活动净额, 期末现金余额"},
+        {"name": "check2-appendix-checked", "description": "附注明细加总已验证", "check": "result file mentions 附注明细 or verifies specific notes items"},
+        {"name": "check2-cross-table-checked", "description": "跨表勾稽已验证", "check": "result file mentions 跨表勾稽 or 货币资金=CF期末现金"},
+        {"name": "check3-performed", "description": "错别字/语句问题已执行", "check": "result file mentions 错别字, 语句问题, or lists text issues"},
+        {"name": "issue-profit-table-found", "description": "发现了未分配利润表净利润不一致问题", "check": "result file mentions 未分配利润.*净利润 or 51,705.*-90,492"},
+        {"name": "summary-stats-exist", "description": "汇总统计已包含", "check": "result file contains 问题汇总 or 通过率 section"}
+      ],
+      "eval_result": {
+        "with_skill_pass": "10/10 (100%)",
+        "old_skill_pass": "10/10 (100%)",
+        "notes": "单年度场景两版差异较小。增强版优势在于输出格式规范性和跨年度衔接说明标记。"
+      }
     },
     {
       "id": 2,
-      "prompt": "帮我看看普陀区老年人体育协会的审计报告。报告在 D:\\审计\\2024\\普陀老体协\\审计报告.docx，汇总表在同目录下叫 2024年汇总表.xlsx。我怀疑汇总表里的政府补助收入数字和报告对不上，你帮我查查，再看看报告内部有没有其他问题。",
-      "expected_output": "对该协会执行三类核对，重点关注政府补助收入的勾稽关系，输出核对结果文件",
-      "files": [],
-      "expectations": [
-        "正确识别并提取了报告和汇总表文件",
-        "核对了政府补助收入这一具体项目",
-        "执行了全部三类核对而不只核对指定项",
-        "输出了该协会的核对结果文件"
-      ]
+      "eval_name": "two-year-2023-2024",
+      "prompt": "帮我核对 /Users/martin/Documents/OpenCode/KFL审计报告/ 中2023年和2024年这两年的审计报告和财报。每个年份的目录结构类似（封面、目录、报告正文、财务报表xlsx、附注docx）。请系统性地完成核对，尤其是这两年之间的跨年度数据衔接和问题传播情况，生成一份包含两个年度核对的综合结果文件。",
+      "expected_output": "包含两个年度各自的三类核对结果，以及跨年度数据衔接和问题传播检查的综合Markdown文件。必须包含：年份完整性检查、跨年度数据衔接表、跨年度问题传播分析表。",
+      "assertions": [
+        {"name": "results-file-exists", "description": "核对结果文件被创建", "check": "output directory contains at least one .md result file"},
+        {"name": "both-years-present", "description": "2023和2024两年的核对结果都存在", "check": "result file mentions both 2023 and 2024 as separate year sections"},
+        {"name": "cross-year-data-check-exists", "description": "跨年度数据衔接检查已执行", "check": "result file mentions 跨年度 or 数据衔接 or 上年期末=本期期初"},
+        {"name": "cross-year-propagation-check-exists", "description": "跨年度问题传播检查已执行", "check": "result file mentions 问题传播 or 跨年度问题 or 影响年度"},
+        {"name": "year-completeness-check-exists", "description": "年份完整性检查已执行", "check": "result file mentions 年份完整 or 要求核对 or 实际核对"},
+        {"name": "summary-covers-both-years", "description": "汇总统计覆盖了两个年份", "check": "summary section contains data for both 2023 and 2024"},
+        {"name": "cross-year-issue-identified", "description": "至少发现了一个跨年份的问题", "check": "result file identifies an issue that spans multiple years"},
+        {"name": "table-header-error-in-both", "description": "应收账款表头错误在两个年份都被发现", "check": "result file mentions 预付账款.*应收账款 or 表头.*错误 for both years"}
+      ],
+      "eval_result": {
+        "with_skill_pass": "8/8 (100%)",
+        "old_skill_pass": "3/8 (37.5%)",
+        "notes": "增强版发现表头错误和繁体字两个传播问题。旧版仅独立记录各自年份的2个问题，无法识别传播模式。"
+      }
     },
     {
       "id": 3,
-      "prompt": "我这里有 3 家协会的审计报告核对需求，但是其中一家的汇总表好像有问题，打开都是乱码。另外两家的数据我已经用 MinerU 提取好了放在 C:\\temp\\extracted\\ 下面。你先帮我把那两家正常的核对完，至于汇总表乱码的那家，你看看能不能只核对报告内部的勾稽关系和错别字。",
-      "expected_output": "对正常的两家执行全部三类核对，对汇总表异常的一家执行核对二和核对三并记录问题",
-      "files": [],
-      "expectations": [
-        "对数据完整的两家协会执行了全部三类核对",
-        "对汇总表异常的一家执行了核对二和核对三",
-        "在结果文件中记录了汇总表异常的情况",
-        "输出了完整的核对结果文件"
-      ]
+      "eval_name": "three-year-2023-2024-2025",
+      "prompt": "请核对 /Users/martin/Documents/OpenCode/KFL审计报告/ 中2023、2024、2025连续三年的审计报告和财务报表。每个年份下都有对应的审计报告正文.docx、财务报表.xlsx和附注.docx。请严格按照先纵向（每年单独核对）再横向（跨年度检查）的流程执行，特别关注年份完整性、跨年度数据衔接和问题传播，生成全面的核对结果文件。",
+      "expected_output": "包含三个年度完整的纵向核对结果+横向（年份完整性、数据衔接、问题传播、汇总交叉比对）的综合Markdown文件。必须包含：年份完整性检查表、两个衔接对的详细数据、问题传播热力图、核心数据汇总表。",
+      "assertions": [
+        {"name": "results-file-exists", "description": "核对结果文件被创建", "check": "output directory contains at least one .md result file"},
+        {"name": "all-three-years-present", "description": "三年核对结果都存在", "check": "result file mentions 2023, 2024, and 2025 as separate year sections"},
+        {"name": "year-completeness-check-exists", "description": "年份完整性检查已执行", "check": "result file contains year completeness check table"},
+        {"name": "both-cross-year-transitions", "description": "两个衔接对都检查了", "check": "result file mentions both 2023末→2024初 and 2024末→2025初"},
+        {"name": "propagation-check-exists", "description": "问题传播检查已执行", "check": "result file explicitly discusses propagation patterns across years"},
+        {"name": "table-header-error-all-years", "description": "表头错误被识别为三年都存在", "check": "result file identifies the 表头 issue as present in all three years"},
+        {"name": "traditional-char-partial-years", "description": "繁体字被识别为部分年份存在", "check": "result file notes that 繁体字 exists in 2023/2024 but not 2025"},
+        {"name": "summary-covers-all-years-and-cross", "description": "汇总覆盖所有三年和跨年度检查项", "check": "summary includes data for all three years plus cross-year items"},
+        {"name": "priority-ordered-issues", "description": "问题清单按优先级排序", "check": "issues list has a priority column and is ordered by priority level"},
+        {"name": "propagation-reference-identified", "description": "未分配利润问题被识别为引用传播", "check": "result file notes that the 2023 未分配利润 issue propagates via reference"}
+      ],
+      "eval_result": {
+        "with_skill_pass": "10/10 (100%)",
+        "old_skill_pass": "2/10 (20%)",
+        "notes": "三年度场景差异最大化。增强版发现3类传播模式（模板/格式/引用），旧版仅独立记录各自年份问题。"
+      }
     }
   ]
 }

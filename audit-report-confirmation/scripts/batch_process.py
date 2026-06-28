@@ -18,7 +18,6 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-
 def discover_associations(data_dir: str) -> list:
     """从目录中自动发现协会名称"""
     data_path = Path(data_dir)
@@ -33,7 +32,6 @@ def discover_associations(data_dir: str) -> list:
         names.add(stem)
     
     return sorted(names)
-
 
 def find_files(data_dir: str, assoc_name: str) -> tuple:
     """查找协会对应的报告和汇总表文件"""
@@ -65,7 +63,6 @@ def find_files(data_dir: str, assoc_name: str) -> tuple:
             break
     
     return report_file, summary_file
-
 
 def run_single_check(assoc_name: str, report_file: str, summary_file: str, 
                      output_dir: str, compare_script: str) -> dict:
@@ -104,7 +101,6 @@ def run_single_check(assoc_name: str, report_file: str, summary_file: str,
         result["error"] = str(e)
     
     return result
-
 
 def generate_master_report(
     results: list,
@@ -185,7 +181,6 @@ def generate_master_report(
         f.write(text)
     print(f"汇总核对结果已写入: {output_path}")
 
-
 def main():
     parser = argparse.ArgumentParser(description="批量审计报告核对工具")
     parser.add_argument("--data-dir", "-d", required=True, 
@@ -259,7 +254,6 @@ def main():
     print(f"\n{'='*40}")
     print(f"处理完成: {success}/{len(results)} 成功")
     print(f"汇总文件: {args.output}")
-
 
 if __name__ == "__main__":
     main()

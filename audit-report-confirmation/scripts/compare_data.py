@@ -21,7 +21,6 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-
 # ============================================================
 # 数据模型
 # ============================================================
@@ -55,7 +54,6 @@ class FinancialData:
             self.yearly_data[year] = {}
         self.yearly_data[year][category] = value
 
-
 # ============================================================
 # Markdown 数值提取
 # ============================================================
@@ -87,7 +85,6 @@ def extract_numbers_from_md(text: str) -> List[Tuple[str, float]]:
     
     return results
 
-
 def extract_tables_from_md(text: str) -> List[List[List[str]]]:
     """从 Markdown 中提取表格结构"""
     tables = []
@@ -116,7 +113,6 @@ def extract_tables_from_md(text: str) -> List[List[List[str]]]:
     
     return tables
 
-
 # ============================================================
 # 核对逻辑
 # ============================================================
@@ -135,7 +131,6 @@ class CheckResult:
         status = "✅" if self.passed else "❌"
         return f"| {self.item} | {self.report_val} | {self.summary_val} | {status} | {self.note} |"
 
-
 class InternalCheckResult:
     """内部勾稽关系核对结果"""
     def __init__(self, check_item: str, expected: str, actual: str, 
@@ -150,13 +145,11 @@ class InternalCheckResult:
         status = "✅" if self.passed else "❌"
         return f"| {self.check_item} | {self.expected} | {self.actual} | {status} | {self.note} |"
 
-
 def fmt(val: Optional[float]) -> str:
     """格式化数值显示"""
     if val is None:
         return "-"
     return f"{val:,.2f}"
-
 
 def compare_values(report_val: Optional[float], summary_val: Optional[float], 
                    tolerance: float = 0.01) -> Tuple[bool, float, str]:
@@ -176,7 +169,6 @@ def compare_values(report_val: Optional[float], summary_val: Optional[float],
         return True, round(report_val - summary_val, 2), "一致"
     else:
         return False, round(report_val - summary_val, 2), f"差异 {diff:.2f}"
-
 
 def check_internal_consistency(data: FinancialData) -> List[InternalCheckResult]:
     """核对报告内部数据勾稽关系"""
@@ -235,7 +227,6 @@ def check_internal_consistency(data: FinancialData) -> List[InternalCheckResult]
     
     return results
 
-
 # ============================================================
 # 手动输入模式
 # ============================================================
@@ -291,7 +282,6 @@ def manual_input() -> Tuple[FinancialData, FinancialData]:
     
     return report, summary
 
-
 # ============================================================
 # 自动提取模式
 # ============================================================
@@ -330,7 +320,6 @@ def auto_extract(filepath: str) -> FinancialData:
                 data.expense_details[cat] = value
     
     return data
-
 
 # ============================================================
 # 报告生成
@@ -405,7 +394,6 @@ def generate_report(
     
     return report_text
 
-
 # ============================================================
 # 主入口
 # ============================================================
@@ -475,7 +463,6 @@ def main():
     name = args.name or (Path(args.report).stem if args.report else "未知")
     generate_report(name, report, summary, cross_checks, internal_checks, 
                    output_path=args.output)
-
 
 if __name__ == "__main__":
     main()
