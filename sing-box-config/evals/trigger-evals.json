@@ -1,0 +1,90 @@
+[
+  {
+    "query": "我家是 Ubuntu 24.04，想用 sing-box 1.14 做全局 TUN 透明代理，顺便开个 7890 的 mixed 端口，帮我写 config.jsonc。",
+    "should_trigger": true
+  },
+  {
+    "query": "sing-box 的 route.rules 里 action 和 outbound 到底怎么组合？我 1.14.4 写 `outbound` 被 check 拒了。",
+    "should_trigger": true
+  },
+  {
+    "query": "sing-box check 报 `unknown field \"sniff\"`，在 tun inbound 里，1.14.4，怎么最小修？",
+    "should_trigger": true
+  },
+  {
+    "query": "我有个 Clash 订阅，想转成 sing-box 1.14 的配置，节点是 vless ws tls。",
+    "should_trigger": true
+  },
+  {
+    "query": "1.12.8 升 1.14.4 要改哪些字段？我的 dns 和 rule_set 都是旧的。",
+    "should_trigger": true
+  },
+  {
+    "query": "hysteria2 outbound 的 obfs 和 tls 怎么配？顺便看下 up_mbps 还要不要。",
+    "should_trigger": true
+  },
+  {
+    "query": "1.14 里 dns.fakeip 还能用吗？还是必须改成 fakeip server？",
+    "should_trigger": true
+  },
+  {
+    "query": "远程 rule-set 下载想走 direct，http_client 和 default_http_client 怎么设？",
+    "should_trigger": true
+  },
+  {
+    "query": "Write me a sing-box 1.14 config with mixed inbound, Clash API and a VLESS outbound.",
+    "should_trigger": true
+  },
+  {
+    "query": "vmess ws tls 的 outbound 字段有哪些？我不确定 transport 和 tls 怎么写。",
+    "should_trigger": true
+  },
+  {
+    "query": "我还在 1.11，能用 route.default_http_client 吗？",
+    "should_trigger": true
+  },
+  {
+    "query": "sing-box 配置里 domain_strategy 默认值是多少？1.14 还要写吗？",
+    "should_trigger": true
+  },
+  {
+    "query": "帮我写个 mihomo 的 TUN 配置，mixed 端口 7890。",
+    "should_trigger": false
+  },
+  {
+    "query": "Xray 的 vless reality 配置怎么写？",
+    "should_trigger": false
+  },
+  {
+    "query": "怎么安装 Clash Verge？",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我把这段 JSON 格式化一下，缩进改成 2 空格。",
+    "should_trigger": false
+  },
+  {
+    "query": "我家网速很慢，晚上看视频卡，怎么排查？",
+    "should_trigger": false
+  },
+  {
+    "query": "sing-box GUI 客户端怎么导入机场订阅？",
+    "should_trigger": false
+  },
+  {
+    "query": "Clash 的 proxy-groups 和 rule-providers 怎么配？",
+    "should_trigger": false
+  },
+  {
+    "query": "v2rayN 怎么设置路由规则？",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我写个 Python 脚本，解析 config.json 里的 outbounds。",
+    "should_trigger": false
+  },
+  {
+    "query": "Surge 的规则怎么转换成 Clash？",
+    "should_trigger": false
+  }
+]

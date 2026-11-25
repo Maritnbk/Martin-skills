@@ -1,0 +1,39 @@
+{
+  // 适用版本：1.14.0 及以上。
+  // 1.11–1.13 删除 "$schema"；更旧的版本先确认字段是否存在。
+  // 这个骨架只保证结构最小、可启动；代理节点、分流、TUN 按需加。
+  "$schema": "https://sing-box.sagernet.org/schema.json",
+
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+
+  "dns": {
+    "servers": [
+      { "type": "local", "tag": "dns-local" }
+    ],
+    "final": "dns-local"
+  },
+
+  "inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 2080
+    }
+  ],
+
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+
+  "route": {
+    // 没有分流需求时，final 指向 direct 即可
+    "final": "direct"
+  }
+}

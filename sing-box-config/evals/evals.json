@@ -1,0 +1,116 @@
+{
+  "skill_name": "sing-box-config",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我用的是 sing-box 1.12.8（Linux，有 root），想搭一个 TUN 透明代理：本机再开一个 mixed 端口 7890，Clash API 9090，DNS 走 223.5.5.5，国外流量走我的 VLESS 节点（节点信息我稍后填）。请直接给我一份能跑的 config.jsonc，并告诉我哪些地方需要替换。",
+      "expected_output": "一份面向 1.12.8 的最小配置：TUN 用 address、mixed inbound、experimental.clash_api、VLESS outbound、1.12 格式的 DNS server；明确标注占位符和验证级别，不混入 1.14 字段。",
+      "files": [],
+      "expectations": [
+        "明确声明目标版本为 sing-box 1.12.8，不默认最新版或 1.14。",
+        "配置中不出现 `$schema`（该字段 1.14.0 才引入，1.12.8 加上会变成未知字段）。",
+        "TUN 使用 `address` 数组，不使用 1.10 的 `inet4_address` / `inet6_address`。",
+        "包含 mixed inbound、`experimental.clash_api` 和 vless outbound，字段名符合 1.12 文档。",
+        "不出现 1.14 才有的 `dns_mode`、`http_clients`、`route.default_http_client`、`network_namespaces` 等字段。",
+        "UUID、密码、订阅链接使用占位符，不编造真实凭据。",
+        "引用至少 2 个官方文档页面，并说明 1.12.8 没有 tag 级 schema，不能声称 schema 通过。"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "这是我在 sing-box 1.10 用的配置，现在准备升到 1.14.4。帮我审查哪些会坏，给最小迁移方案，不要整份重写：\n\n```json\n{\n  \"log\": {\"level\": \"info\"},\n  \"dns\": {\n    \"servers\": [{\"address\": \"223.5.5.5\", \"detour\": \"direct\"}],\n    \"final\": \"local\"\n  },\n  \"inbounds\": [{\n    \"type\": \"tun\",\n    \"inet4_address\": \"172.19.0.1/30\",\n    \"auto_route\": true,\n    \"sniff\": true\n  }],\n  \"outbounds\": [\n    {\"type\": \"vless\", \"tag\": \"proxy\", \"server\": \"example.com\", \"server_port\": 443, \"uuid\": \"00000000-0000-0000-0000-000000000000\"},\n    {\"type\": \"block\", \"tag\": \"block\"},\n    {\"type\": \"direct\", \"tag\": \"direct\"}\n  ],\n  \"route\": {\n    \"rules\": [{\"outbound\": \"block\", \"domain\": [\"ads.example.com\"]}],\n    \"final\": \"proxy\"\n  }\n}\n```",
+      "expected_output": "逐项指出 block outbound、TUN inet4_address、inbound sniff、旧 DNS server 格式在 1.14 的变化；说明 route rule 的 outbound 字段本身仍合法，真正要改的是它指向的 block outbound；给出最小迁移片段。",
+      "files": [],
+      "expectations": [
+        "识别 `outbound: \"block\"` 在 1.11 废弃、1.13 移除，替代为 `action: \"reject\"`。",
+        "识别 TUN `inet4_address` 在 1.10 废弃、1.12 移除，替代为 `address`。",
+        "识别 inbound `sniff` 在 1.11 废弃、1.13 移除，替代为 route action `sniff`。",
+        "识别旧 DNS server `address` 格式在 1.14 移除，替代为 `{type: \"udp\", server: \"223.5.5.5\"}`。",
+        "说明 route rule 的 `outbound` 字段在 1.14 仍可用（默认 `action: \"route\"`）；真正要改的是它指向的 `block` outbound，应改为 `action: \"reject\"` 或删除该引用。",
+        "引用 `/migration/` 或 `/deprecated/` 页面，逐项给出最小修改，不整份重写。",
+        "不发明 1.10 或 1.14 不存在的字段，并说明目标是 1.14.4。"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "sing-box 1.14.4 里 inbound 的 `sniff` 和 `domain_strategy` 还需要写吗？`domain_strategy` 的默认值是什么？我只想确认这两个字段，不要给我整份配置。",
+      "expected_output": "轻量解释：两个字段都在 1.11 废弃、1.13 移除；用 route action sniff / resolve 或 DNS strategy 替代；domain_strategy 已无默认值。",
+      "files": [],
+      "expectations": [
+        "明确说明 `sniff` 和 `domain_strategy` 都在 1.11 废弃、1.13 移除。",
+        "说明 `domain_strategy` 已移除，因此不存在可用的默认值；1.14 用 DNS `strategy` 或 route `resolve` 动作表达同类需求。",
+        "若提到 route action `sniff`，默认超时为 300ms。",
+        "只给 3–5 行左右的轻量解释，不输出整份配置。",
+        "引用具体页面（tun、route action、deprecated），而不是泛泛说“官方文档”。"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "sing-box 1.14.4，`sing-box check` 报：`unknown field \"sniff\"`，位置在 inbound tun 里。配置文件很大，我不想重写，怎么最小修复？",
+      "expected_output": "指出 sniff 是 1.13 已移除的 inbound 字段；最小修复是删除该行，必要时再加 route action sniff；不重写整份配置。",
+      "files": [],
+      "expectations": [
+        "指出 `sniff` 不是拼写错误，而是 1.13 已移除的 inbound 字段。",
+        "最小修复是删除该行；若确实需要嗅探，再加 route rule `action: \"sniff\"`。",
+        "不改动无关字段，不重写整份配置。",
+        "引用 tun、deprecated、route action 页面。",
+        "说明由于只看到报错、没看到完整配置，只能给最小补丁和确认步骤。"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "把这个 Clash/mihomo 的 vless + ws + tls 节点转成 sing-box 1.14.4 的 outbound，只要 outbound 片段：\n\n```yaml\nproxies:\n  - name: node1\n    type: vless\n    server: example.com\n    port: 443\n    uuid: 11111111-1111-1111-1111-111111111111\n    network: ws\n    tls: true\n    servername: example.com\n    skip-cert-verify: false\n    ws-opts:\n      path: /ws\n      headers:\n        Host: example.com\n```",
+      "expected_output": "一个 sing-box 1.14.4 outbound 片段，ws 放到 transport，TLS 字段正确，且不残留 Clash 键名。",
+      "files": [],
+      "expectations": [
+        "输出包含 `type: \"vless\"`、`server`、`server_port`、`uuid`。",
+        "`transport` 为 `{type: \"ws\", path: \"/ws\", headers: {Host: \"example.com\"}}`。",
+        "`tls` 为 `{enabled: true, server_name: \"example.com\", insecure: false}`。",
+        "不出现 Clash 键名 `ws-opts`、`servername`、`skip-cert-verify`、`network: ws`。",
+        "只给 outbound 片段，不夹带 inbound/route。",
+        "引用 vless、transport、tls 的官方页面。"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "这是 1.12.8 的配置，升到 1.14.4 要注意什么？给我逐项影响和迁移后的关键片段：\n\n```json\n{\n  \"dns\": {\n    \"servers\": [{\"tag\": \"local\", \"address\": \"223.5.5.5\", \"detour\": \"direct\"}],\n    \"final\": \"local\",\n    \"independent_cache\": true\n  },\n  \"inbounds\": [{\"type\": \"tun\", \"address\": [\"172.19.0.1/30\"], \"auto_route\": true}],\n  \"outbounds\": [{\"type\": \"vless\", \"tag\": \"proxy\", \"server\": \"example.com\", \"server_port\": 443, \"uuid\": \"00000000-0000-0000-0000-000000000000\"}],\n  \"route\": {\n    \"rules\": [{\"rule_set\": \"geosite-cn\", \"outbound\": \"direct\"}],\n    \"rule_set\": [{\"type\": \"remote\", \"tag\": \"geosite-cn\", \"format\": \"binary\", \"url\": \"https://example.com/geosite.srs\", \"download_detour\": \"direct\"}],\n    \"final\": \"proxy\"\n  },\n  \"experimental\": {\"cache_file\": {\"enabled\": true, \"store_rdrc\": true}}\n}\n```",
+      "expected_output": "逐项列出 1.14 的 DNS、缓存、HTTP client、store_rdrc、route rule 变化，并给出迁移后的关键片段。",
+      "files": [],
+      "expectations": [
+        "把旧 DNS server `address` 格式改为 `{type: \"udp\", server: \"223.5.5.5\", detour: \"direct\"}`。",
+        "指出 `independent_cache` 在 1.14 废弃（1.16 移除），应从配置删除。",
+        "指出 `download_detour` 在 1.14 废弃（1.16 移除），改用 `http_client`、顶层 `http_clients` 和 `route.default_http_client`。",
+        "指出 `store_rdrc` 应改为 `store_dns`。",
+        "说明 route rule 的 `outbound` 字段在 1.14 仍合法（默认 `action: \"route\"`），不要把它误报为移除字段；如需显式 action 可写 `action: \"route\"` + `outbound`。",
+        "引用 `/migration/` 和 `/deprecated/`，逐项列影响，不只给结论。",
+        "不把原 1.12 配置直接标成 1.14.4 已验证可用。"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "我还在用 sing-box 1.11.0，看到文档里有 `route.default_http_client`，是不是可以直接加到配置里，让 rule-set 下载走代理？",
+      "expected_output": "明确 default_http_client 是 1.14 才引入，1.11 没有；给 1.11 可用的 download_detour 方案或建议升级，不拿最新文档硬套。",
+      "files": [],
+      "expectations": [
+        "明确 `route.default_http_client` 是 1.14.0 引入，1.11.0 不存在。",
+        "不把最新文档的字段直接套到 1.11。",
+        "给出 1.11 可行替代：使用当时的 `download_detour`，或建议升级。",
+        "引用 v1.11.0 tag 文档或 1.14 changelog 作为版本依据。",
+        "不生成包含 `default_http_client` 的 1.11 配置。"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "sing-box 官方文档站现在打不开，GitHub 也连不上。你凭经验帮我写一份 1.14.4 的 tuic 配置，我急着用。",
+      "expected_output": "拒绝凭记忆生成配置，说明风险，请用户提供本地文档或给出 clone 命令；不输出猜测的 tuic 配置。",
+      "files": [],
+      "expectations": [
+        "明确拒绝凭记忆生成配置。",
+        "说明文档不可达时无法保证字段准确，可能产生幻觉。",
+        "请用户提供本地文档，或给出 `git clone --depth 1 --branch v1.14.4 https://github.com/SagerNet/sing-box` 之类的获取方式。",
+        "不输出完整 tuic 配置，不猜字段或默认值。",
+        "可以给不依赖文档的下一步，但不声称配置可用。"
+      ]
+    }
+  ]
+}

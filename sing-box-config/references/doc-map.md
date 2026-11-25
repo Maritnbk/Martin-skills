@@ -1,12 +1,30 @@
 # sing-box 官方文档 URL 地图
 
-站点：<https://sing-box.sagernet.org> （Docusaurus 静态站）
+站点：<https://sing-box.sagernet.org>（只跟随最新发布线）
+
+**最后核对：2026-11-23。** 线上已包含 `Since 1.15.0` 的 Tailcat / MASQUE 页面，当前稳定版为 1.14.4。站点比稳定版超前是常态，**不要默认"线上文档 = 用户版本"**。
+
+## 先选对版本
+
+| 用户版本 | 文档来源 |
+|---|---|
+| 1.11.0 及以上稳定版 | `https://raw.githubusercontent.com/SagerNet/sing-box/v<version>/docs/...` |
+| 预发布 / alpha | `https://raw.githubusercontent.com/SagerNet/sing-box/testing/docs/...` |
+| 1.10.0 及以下 | 对应 tag，best-effort，先建议升级 |
+| 只想看最新线 / tag 缺页 | 线上站点 |
+
+- 版本化文档是官方仓库里的源文件，和线上站点同源；markdown 比 HTML 省 token，且与 tag 精确对应。
+- 目录页对应 `index.md`：`/configuration/` → `docs/configuration/index.md`，`/configuration/inbound/` → `docs/configuration/inbound/index.md`。
+- 中文版是同目录的 `<page>.zh.md`，例如 `docs/configuration/inbound/mixed.zh.md`；不是每页都有。术语可对照中文，字段语义以英文页为准（翻译可能滞后）。
+- JSON Schema：线上 `https://sing-box.sagernet.org/schema.json`；tag 下 `docs/schema.json` 只在 v1.14.0 及以上存在（1.13 及以前没有）。
+- `testing` 分支对应线上预览线；`dev` 分支的 docs 路径返回 404，不要用。
+- 引用给用户时用站点 URL（可点击），抓取时用 raw markdown，并在回答里注明"依据版本 vX.Y.Z"。
 
 **三条硬约束：**
 
-1. **所有配置页 URL 必须带结尾斜杠**：`/configuration/log/` 可以，`/configuration/log` 可能取不到。根配置页就是 `/configuration/` 本身。
+1. **线上配置页 URL 必须带结尾斜杠**：`/configuration/log/` 可以，`/configuration/log` 可能取不到。根配置页就是 `/configuration/` 本身。
 2. **没有 llms.txt / llms-full.txt**（`/llms.txt` 和 `/llms-full.txt` 均返回 404）。不存在整站合并版本，只能逐页抓。
-3. **URL 里没有版本号**，站点只跟随最新发布线，没有 `dev` / `legacy` / `1.12` 这类分支路径。版本信息在页面正文里（见下方"版本标记"）。
+3. **线上 URL 里没有版本号**，站点只跟随最新发布线，没有 `1.12` / `legacy` 这类路径。精确版本请用 GitHub tag；版本标记在页面正文里（见下）。
 
 不确定某个协议或字段属于哪一页时，先抓 `/configuration/` 读它的导航树，再定点抓取。
 
@@ -25,7 +43,19 @@
 
 集中查废弃/移除：先看 `/deprecated/`（按版本分组的废弃清单），再看 `/migration/`（旧写法 → 新写法的对照，含 JSON 示例），`/changelog/` 看发布说明。
 
-已知的废弃批次集中在 **1.11.0 / 1.12.0 / 1.14.0**。文档当前对应到 `1.14.0-rc.1`，略超前于最后一个稳定版。
+已知的废弃批次集中在 **1.11.0 / 1.12.0 / 1.14.0**。线上文档已跟到 1.15 预览线；用稳定版时务必以对应 tag 为准。
+
+## 版本差异速查（仅索引，最终以 `/deprecated/` 和 `/migration/` 为准）
+
+| 变化 | 版本 | 依据 |
+|---|---|---|
+| `block` / `dns` 等 legacy special outbound 废弃，改用 rule action | 1.11.0 | `/migration/`、`/deprecated/` |
+| `wireguard` outbound 废弃，迁移到 `endpoint/wireguard/` | 1.11.0 | `/migration/`、`/deprecated/` |
+| 旧格式 DNS server（`legacy`）废弃，迁移到新 server 格式 | 1.12.0 | `/migration/`、`/deprecated/` |
+| 顶层 `dns/fakeip/` 移除，改用 `dns/server/fakeip/` | 1.14.0 | `/deprecated/`、`/migration/` |
+| `$schema`、`certificate_providers`、`http_clients`、`network_namespaces` | 1.14.0 | 各页 `Since sing-box 1.14.0` |
+| `tailcat` inbound / outbound | 1.15.0 | 线上页标记 `Since sing-box 1.15.0` |
+| `masque-client` / `masque-server` endpoint | 1.15.0 | 线上页标记 `Since sing-box 1.15.0` |
 
 ---
 
@@ -41,23 +71,47 @@
 
 ## 顶层配置对象
 
+v1.14.4 的根配置字段（来自 `docs/configuration/index.md` 的 Fields 表）：
+
 | 对象 | URL |
 |---|---|
 | 根配置（Structure / Fields / **Check** / **Format** / Merge） | `/configuration/` |
+| `$schema`（Since 1.14.0） | `/configuration/schema/` |
 | log | `/configuration/log/` |
 | dns | `/configuration/dns/` |
 | ntp | `/configuration/ntp/` |
 | certificate | `/configuration/certificate/` |
+| certificate_providers（Since 1.14.0） | `/configuration/shared/certificate-provider/` |
+| http_clients（Since 1.14.0） | `/configuration/shared/http-client/` |
+| network_namespaces（Since 1.14.0） | `/configuration/network-namespace/` |
 | endpoints | `/configuration/endpoint/` |
 | inbounds | `/configuration/inbound/` |
 | outbounds | `/configuration/outbound/` |
 | route | `/configuration/route/` |
-| experimental | `/configuration/experimental/` |
 | services | `/configuration/service/` |
-| JSON Schema | `/configuration/schema/` |
-| network namespace | `/configuration/network-namespace/` |
+| experimental | `/configuration/experimental/` |
 
-`sing-box check` / `format` 的用法在 `/configuration/` 页面的 Check / Format 小节。
+`sing-box check` / `format` / `merge` 的用法在 `/configuration/` 页面的 Check / Format / Merge 小节：
+
+```bash
+sing-box check -c config.json
+sing-box check -C config_directory
+sing-box format -w -c config.json
+sing-box merge output.json -c config.json
+sing-box schema -o schema.json   # 1.14.0+，按本机版本生成 schema
+```
+
+`-C/--config-directory` 指定配置目录，`-D/--directory` 指定工作目录。官方页面 format/merge 示例里的 `-D config_directory` 实际是切工作目录；目录式配置请用 `-C`（CLI 源码 `cmd/sing-box/cmd.go`）。
+
+---
+
+## Network Namespace（`network_namespaces`，Since 1.14.0）
+
+| 内容 | URL |
+|---|---|
+| 总览 | `/configuration/network-namespace/` |
+| default | `/configuration/network-namespace/default/` |
+| unshare | `/configuration/network-namespace/unshare/` |
 
 ---
 
@@ -76,10 +130,11 @@ DNS server 每种类型一页，路径 `/configuration/dns/server/<type>/`：
 `legacy`（旧格式）、`local`、`hosts`、`tcp`、`udp`、`tls`、`quic`、`https`、`http3`、`dhcp`、`mdns`、`fakeip`、`tailscale`、`openconnect`、`openvpn`、`resolved`
 
 ⚠️ **两个 fakeip 页面不要混**：
+
 - `/configuration/dns/server/fakeip/` — 当前的 server 类型（Since 1.12.0）
 - `/configuration/dns/fakeip/` — 旧的顶层 fakeip 配置（Removed in 1.14.0）
 
-⚠️ 旧格式 DNS server 写法在 1.14.0 被移除，写 DNS 配置前务必读 `/configuration/dns/server/` 和 `/migration/`。
+⚠️ 旧格式 DNS server 在 1.12.0 废弃、1.14.0 移除。写 DNS 配置前务必读 `/configuration/dns/server/` 和 `/migration/`。
 
 ---
 
@@ -91,8 +146,8 @@ DNS server 每种类型一页，路径 `/configuration/dns/server/<type>/`：
 | 路由规则 | `/configuration/route/rule/` ⚠️大 |
 | 规则动作 | `/configuration/route/rule_action/` ⚠️大 |
 | 协议嗅探 | `/configuration/route/sniff/` |
-| geoip（1.12.0 已移除相关字段，查文档确认） | `/configuration/route/geoip/` |
-| geosite（同上） | `/configuration/route/geosite/` |
+| geoip（Removed in 1.12.0；1.8.0 起废弃） | `/configuration/route/geoip/` |
+| geosite（Removed in 1.12.0；1.8.0 起废弃） | `/configuration/route/geosite/` |
 
 ---
 
@@ -109,7 +164,7 @@ DNS server 每种类型一页，路径 `/configuration/dns/server/<type>/`：
 
 ## Inbound（`/configuration/inbound/<proto>/`）
 
-`direct`、`mixed`、`socks`、`http`、`shadowsocks`、`vmess`、`vless`、`trojan`、`naive`、`hysteria`、`hysteria2`、`shadowtls`、`tuic`、`anytls`、`snell`、`tun`、`redirect`、`tproxy`、`cloudflared`
+`direct`、`mixed`、`socks`、`http`、`shadowsocks`、`vmess`、`vless`、`trojan`、`naive`、`hysteria`、`hysteria2`、`shadowtls`、`tuic`、`anytls`、`snell`、`tun`、`redirect`、`tproxy`、`cloudflared`、`tailcat`（Since 1.15.0，线上/testing）
 
 **每个 inbound 都要同时读 `/configuration/shared/listen/`**（监听相关的公共字段在那里，不在协议页上）。
 
@@ -119,17 +174,17 @@ DNS server 每种类型一页，路径 `/configuration/dns/server/<type>/`：
 
 ## Outbound（`/configuration/outbound/<proto>/`）
 
-`direct`、`block`、`selector`、`urltest`、`socks`、`http`、`shadowsocks`、`vmess`、`vless`、`trojan`、`naive`、`hysteria`、`hysteria2`、`tuic`、`wireguard`、`anytls`、`shadowtls`、`snell`、`ssh`、`tor`、`dns`、`bridge`
+`direct`、`block`、`selector`、`urltest`、`socks`、`http`、`shadowsocks`、`vmess`、`vless`、`trojan`、`naive`、`hysteria`、`hysteria2`、`tuic`、`wireguard`、`anytls`、`shadowtls`、`snell`、`ssh`、`tor`、`dns`、`bridge`、`tailcat`（Since 1.15.0，线上/testing）
 
 **每个出站类型都要同时读 `/configuration/shared/dial/`**（拨号相关的公共字段在那里）。
 
-⚠️ 特殊 outbound（如 `block`、`dns`）在 1.11.0 有废弃变更，被 rule action 取代，务必查 `/deprecated/` 和 `/migration/`。
+⚠️ `block` / `dns` 等 legacy special outbound 在 1.11.0 废弃，改用 rule action；`wireguard` outbound 在 1.11.0 废弃，改用 `endpoint/wireguard/`。务必查 `/deprecated/` 和 `/migration/`。
 
 ---
 
 ## Endpoint（`/configuration/endpoint/<type>/`）
 
-`wireguard` ⚠️大、`tailscale`、`openconnect`、`openvpn-client`、`openvpn-server`
+`wireguard` ⚠️大、`tailscale`、`openconnect`、`openvpn-client`、`openvpn-server`、`masque-client` / `masque-server`（Since 1.15.0，线上/testing）
 
 ---
 
@@ -143,8 +198,9 @@ DNS server 每种类型一页，路径 `/configuration/dns/server/<type>/`：
 | `multiplex/` | 涉及多路复用 |
 | `v2ray-transport/` | ws / grpc / httpupgrade 等传输层 |
 | `udp-over-tcp/` | UoT |
-| `http-client/`、`http2/`、`quic/` | 相关协议细节 |
-| `certificate-provider/`（下含 `acme/`、`tailscale/`、`cloudflare-origin-ca/`） | 自动签发证书 |
+| `http-client/` | 顶层 `http_clients`；HTTP 客户端的公共字段 |
+| `http2/`、`quic/` | 相关协议细节 |
+| `certificate-provider/`（下含 `acme/`、`tailscale/`、`cloudflare-origin-ca/`） | 自动签发证书；顶层 `certificate_providers` 引用这里 |
 | `dns01_challenge/` | ACME DNS-01 |
 | `pre-match/`、`udp-nat/`、`tcp-brutal/`、`wifi-state/`、`neighbor/` | 按需 |
 
@@ -164,9 +220,13 @@ DNS server 每种类型一页，路径 `/configuration/dns/server/<type>/`：
 
 ## 抓取提示
 
-**⚠️大页面**（整页拉进上下文会爆）：`route/rule/`、`route/rule_action/`、`dns/rule/`、`rule-set/headless-rule/`、`shared/listen/`、`shared/dial/`、`shared/tls/`、`endpoint/wireguard/`、`outbound/wireguard/`。用 webfetch 的 prompt 参数只提取需要的字段，或按锚点定位。
+**抓取方式**：优先用官方 tag 的 raw markdown（`.../docs/...md`），它和线上页面同源、省 token、且版本精确；线上 HTML 只用于最新线、tag 缺页或需要确认渲染效果时。使用当前环境的网页抓取工具（`web_fetch` / `WebFetch` / `net_fetch`）。
+
+**⚠️大页面**（整页拉进上下文会爆）：`route/rule/`、`route/rule_action/`、`dns/rule/`、`rule-set/headless-rule/`、`shared/listen/`、`shared/dial/`、`shared/tls/`、`endpoint/wireguard/`、`outbound/wireguard/`。用抓取工具的 prompt/提取参数只提取需要的字段，或按锚点定位。
 
 **小页面**（可整页抓）：`log/`、`inbound/mixed/`、`outbound/selector/`、`outbound/block/`、`dns/server/fakeip/`、`experimental/cache-file/`。
+
+**中文页**：同目录 `<page>.zh.md`。可用于对照术语，但字段名、默认值和版本标记以英文页为准。
 
 **锚点约定**（用于深链某个字段）：
 
@@ -174,4 +234,4 @@ DNS server 每种类型一页，路径 `/configuration/dns/server/<type>/`：
 - 字段名 → 原样，含下划线：`#tcp_keep_alive`、`#domain_strategy`、`#server_port`
 - **同名标题会加数字后缀**：`#timeout` / `#timeout_1`、`#key` / `#key_1`、`#path` / `#path_1` / `#path_2`。深链前先看页面目录确认实际锚点。
 
-**页数多时并行抓**：把不同页面分给多个子 agent，让每个只回传"字段名 + 类型 + 默认值 + 版本标记 + 限制条件"的压缩结果，不要回传原文。
+**页数多时并行抓**：交给当前环境的子 agent（`subagent` / `worker`），让每个只回传"字段名 + 类型 + 默认值 + 版本标记 + 限制条件"的压缩结果，不要回传原文。
